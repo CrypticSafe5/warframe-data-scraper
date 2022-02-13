@@ -1,8 +1,7 @@
 import { parse, Element, TextNode } from 'parse5';
 
-export default function (html: string) {
-	const keys: string[] = [];
-	const output: Partial<Warframe.Page> = {};
+export default function (html: string): Warframe.ExtractedData {
+	const output: Partial<Warframe.ExtractedData> = {};
 
 	const body = parse(html).childNodes[1] as Element;
 	const topLevel = body.childNodes[2] as Element;
@@ -14,24 +13,24 @@ export default function (html: string) {
 			const id = element.attrs.find((e) => e.name === 'id');
 			if (id) {
 				currentKey = id.value;
-				output[id.value as keyof Warframe.Page] = [];
+				output[id.value as keyof Warframe.ExtractedData] = [];
 			}
 		} else if (element.tagName === 'table') {
 			const tbody = element.childNodes.find((e: Element) => e.tagName === 'tbody') as Element;
 			for (const trow of tbody.childNodes) {
 				const row = trow as Element;
 				if (row.childNodes) {
-					const rowData: string[] = [];
+					const rowData: Warframe.PageDataPoint[] = [];
 					for (const td of row.childNodes) {
 						const cell = td as Element;
 						const data = cell.childNodes[0] as TextNode;
-						if (data) rowData.push(data.value);
+						if (data) rowData.push({ tagName: cell.tagName, value: data.value });
 					}
-					output[currentKey as keyof Warframe.Page].push(rowData);
+					output[currentKey as keyof Warframe.ExtractedData].push(rowData);
 				}
 			}
 		}
 	}
-	console.log('>>>>>', output);
-	return {};
+
+	return output as Warframe.ExtractedData;
 }
