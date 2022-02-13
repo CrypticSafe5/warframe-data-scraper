@@ -43,7 +43,9 @@ declare namespace Warframe {
 	type Planet = 'Mercury' | 'Venus' | 'Earth' | 'Lua' | 'Mars' | 'Deimos' | 'Phobos' | 'Ceres' | 'Jupiter' | 'Europa' | 'Saturn' | 'Uranus' | 'Neptune' | 'Pluto' | 'Eris' | 'Kuva Fortress' | 'Void';
 	type MissionType = 'Arena' | 'Assassination' | 'Assault' | 'Capture' | 'Defection' | 'Defense' | 'Disruption' | 'Excavation' | 'Exterminate' | 'Free Roam/Bounty' | 'Hijack' | 'Infested Salvage' | 'Interception' | 'Junction' | 'Mobile Defense' | 'Pursuit' | 'Rescue' | 'Rush' | 'Sabotage' | 'Sanctuary Onslaught' | 'Skirmish' | 'Spy' | 'Survival' | 'Volatile';
 	type Rarity = 'Very Common' | 'Common' | 'Uncommon' | 'Rare' | 'Ultra Rare' | 'Legendary';
-	type Rotation = 'a' | 'b' | 'c';
+	type Rotation = 'A' | 'B' | 'C';
+	type Quality = 'Intact' | 'Exceptional' | 'Flawless' | 'Radiant';
+	type Tier = 'Lith' | 'Meso' | 'Neo' | 'Axi' | 'Requiem';
 
 	interface Mission {
 		planet: Planet;
@@ -53,9 +55,16 @@ declare namespace Warframe {
 		dropList: Drop[];
 	}
 
+	interface Relic {
+		relic: string;
+		tier: Tier;
+		quality: Quality;
+		dropList: Drop[];
+	}
+
 	interface NormalizedData {
 		missionRewards: Mission[];
-		// relicRewards: PageDataPoint[][];
+		relicRewards: Relic[];
 		// keyRewards: PageDataPoint[][];
 		// transientRewards: PageDataPoint[][];
 		// sortieRewards: PageDataPoint[][];
