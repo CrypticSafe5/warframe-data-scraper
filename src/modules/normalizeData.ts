@@ -95,8 +95,47 @@ function normalizeRelicRewards(data: Warframe.PageDataPoint[][]): Warframe.Relic
 	return relicRewardList as Warframe.Relic[];
 }
 
-function normalizeKeyRewards() {
+function normalizeKeyRewards(data: Warframe.PageDataPoint[][]) {
+	const keyMissionList = [];
 
+	let table: Partial<Warframe.KeyMission> = {
+		dropList: []
+	};
+	let rotation: Warframe.Rotation = null;
+	let drop: Partial<Warframe.Drop> = {};
+	for (const row of data) {
+		if (row.length === 0) {
+			// Break point for table
+			keyMissionList.push({ ...table });
+			table = {
+				dropList: []
+			};
+			rotation = null;
+		}
+		for (const cell of row) {
+			if (cell.tagName === 'th' && !('name' in table)) {
+				table.name = cell.value;
+			} else if (cell.tagName === 'th' && row.length === 1) {
+				// Rotation declaration row
+				rotation = cell.value.split('Rotation ')[1] as Warframe.Rotation;
+			} else if (cell.tagName === 'td') {
+				// Data row
+				if (!('drop' in drop)) {
+					drop = {
+						rotation,
+						drop: cell.value
+					};
+				} else {
+					drop.rarity = cell.value.split(' (')[0] as Warframe.Rarity;
+					drop.chance = Number((Number(cell.value.split('(')[1].split('%)')[0]) / 100).toFixed(4));
+					table.dropList.push(drop as Warframe.Drop);
+					drop = {};
+				}
+			}
+		}
+	}
+
+	return keyMissionList as Warframe.KeyMission[];
 }
 
 function normalizeTransientRewards() {
@@ -154,7 +193,7 @@ export default function (pageData: Warframe.ExtractedData): Warframe.NormalizedD
 	return {
 		missionRewards: normalizeMissionRewards(pageData.missionRewards),
 		relicRewards: normalizeRelicRewards(pageData.relicRewards),
-		// keyRewards: normalizeKeyRewards(),
+		keyRewards: normalizeKeyRewards(pageData.keyRewards),
 		// transientRewards: normalizeTransientRewards(),
 		// sortieRewards: normalizeSortieRewards(),
 		// cetusRewards: normalizeCetusRewards(),

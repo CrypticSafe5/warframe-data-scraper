@@ -55,6 +55,11 @@ declare namespace Warframe {
 		dropList: Drop[];
 	}
 
+	interface KeyMission {
+		name: string;
+		dropList: Drop[];
+	}
+
 	interface Relic {
 		relic: string;
 		tier: Tier;
@@ -65,7 +70,7 @@ declare namespace Warframe {
 	interface NormalizedData {
 		missionRewards: Mission[];
 		relicRewards: Relic[];
-		// keyRewards: PageDataPoint[][];
+		keyRewards: KeyMission[];
 		// transientRewards: PageDataPoint[][];
 		// sortieRewards: PageDataPoint[][];
 		// cetusRewards: PageDataPoint[][];
