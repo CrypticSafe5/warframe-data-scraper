@@ -95,7 +95,7 @@ function normalizeRelicRewards(data: Warframe.PageDataPoint[][]): Warframe.Relic
 	return relicRewardList as Warframe.Relic[];
 }
 
-function normalizeKeyRewards(data: Warframe.PageDataPoint[][]) {
+function normalizeKeyRewards(data: Warframe.PageDataPoint[][]): Warframe.KeyMission[] {
 	const keyMissionList = [];
 
 	let table: Partial<Warframe.KeyMission> = {
@@ -138,12 +138,52 @@ function normalizeKeyRewards(data: Warframe.PageDataPoint[][]) {
 	return keyMissionList as Warframe.KeyMission[];
 }
 
-function normalizeTransientRewards() {
+function normalizeTransientRewards(data: Warframe.PageDataPoint[][]): Warframe.TransientMission[] {
+	console.log(data);
+	const transientRewardsList = [];
 
+	let table: Partial<Warframe.KeyMission> = {
+		dropList: []
+	};
+	let rotation: Warframe.Rotation = null;
+	let drop: Partial<Warframe.Drop> = {};
+	for (const row of data) {
+		if (row.length === 0) {
+			// Break point for table
+			transientRewardsList.push({ ...table });
+			table = {
+				dropList: []
+			};
+			rotation = null;
+		}
+		for (const cell of row) {
+			if (cell.tagName === 'th' && !('name' in table)) {
+				table.name = cell.value;
+			} else if (cell.tagName === 'th' && row.length === 1) {
+				// Rotation declaration row
+				rotation = cell.value.split('Rotation ')[1] as Warframe.Rotation;
+			} else if (cell.tagName === 'td') {
+				// Data row
+				if (!('drop' in drop)) {
+					drop = {
+						rotation,
+						drop: cell.value
+					};
+				} else {
+					drop.rarity = cell.value.split(' (')[0] as Warframe.Rarity;
+					drop.chance = Number((Number(cell.value.split('(')[1].split('%)')[0]) / 100).toFixed(4));
+					table.dropList.push(drop as Warframe.Drop);
+					drop = {};
+				}
+			}
+		}
+	}
+
+	return transientRewardsList as Warframe.TransientMission[];
 }
 
-function normalizeSortieRewards() {
-
+function normalizeSortieRewards(data: Warframe.PageDataPoint[][]) {
+	console.log(data);
 }
 
 function normalizeCetusRewards() {
@@ -194,8 +234,8 @@ export default function (pageData: Warframe.ExtractedData): Warframe.NormalizedD
 		missionRewards: normalizeMissionRewards(pageData.missionRewards),
 		relicRewards: normalizeRelicRewards(pageData.relicRewards),
 		keyRewards: normalizeKeyRewards(pageData.keyRewards),
-		// transientRewards: normalizeTransientRewards(),
-		// sortieRewards: normalizeSortieRewards(),
+		transientRewards: normalizeTransientRewards(pageData.transientRewards),
+		sortieRewards: normalizeSortieRewards(pageData.sortieRewards),
 		// cetusRewards: normalizeCetusRewards(),
 		// solarisRewards: normalizeSolarisRewards(),
 		// deimosRewards: normalizeDeimosRewards(),
