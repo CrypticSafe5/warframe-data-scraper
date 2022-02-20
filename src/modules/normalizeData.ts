@@ -139,7 +139,6 @@ function normalizeKeyRewards(data: Warframe.PageDataPoint[][]): Warframe.KeyMiss
 }
 
 function normalizeTransientRewards(data: Warframe.PageDataPoint[][]): Warframe.TransientMission[] {
-	console.log(data);
 	const transientRewardsList = [];
 
 	let table: Partial<Warframe.KeyMission> = {
@@ -156,6 +155,7 @@ function normalizeTransientRewards(data: Warframe.PageDataPoint[][]): Warframe.T
 			};
 			rotation = null;
 		}
+
 		for (const cell of row) {
 			if (cell.tagName === 'th' && !('name' in table)) {
 				table.name = cell.value;
@@ -164,7 +164,10 @@ function normalizeTransientRewards(data: Warframe.PageDataPoint[][]): Warframe.T
 				rotation = cell.value.split('Rotation ')[1] as Warframe.Rotation;
 			} else if (cell.tagName === 'td') {
 				// Data row
-				if (!('drop' in drop)) {
+				if (row.length === 1) {
+					// Edge case of drop being an empty string and a drop chance
+					console.warn('EMPTY_DATA_CELL', table.name, row);
+				} else if (!('drop' in drop)) {
 					drop = {
 						rotation,
 						drop: cell.value
@@ -183,7 +186,7 @@ function normalizeTransientRewards(data: Warframe.PageDataPoint[][]): Warframe.T
 }
 
 function normalizeSortieRewards(data: Warframe.PageDataPoint[][]) {
-	console.log(data);
+
 }
 
 function normalizeCetusRewards() {
@@ -235,7 +238,7 @@ export default function (pageData: Warframe.ExtractedData): Warframe.NormalizedD
 		relicRewards: normalizeRelicRewards(pageData.relicRewards),
 		keyRewards: normalizeKeyRewards(pageData.keyRewards),
 		transientRewards: normalizeTransientRewards(pageData.transientRewards),
-		sortieRewards: normalizeSortieRewards(pageData.sortieRewards),
+		// sortieRewards: normalizeSortieRewards(pageData.sortieRewards),
 		// cetusRewards: normalizeCetusRewards(),
 		// solarisRewards: normalizeSolarisRewards(),
 		// deimosRewards: normalizeDeimosRewards(),

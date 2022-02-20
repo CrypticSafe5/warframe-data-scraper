@@ -75,7 +75,7 @@ declare namespace Warframe {
 		relicRewards: Relic[];
 		keyRewards: KeyMission[];
 		transientRewards: Warframe.TransientMission[];
-		sortieRewards: void; // PageDataPoint[][];
+		// sortieRewards: void; // PageDataPoint[][];
 		// cetusRewards: PageDataPoint[][];
 		// solarisRewards: PageDataPoint[][];
 		// deimosRewards: PageDataPoint[][];
