@@ -185,8 +185,46 @@ function normalizeTransientRewards(data: Warframe.PageDataPoint[][]): Warframe.T
 	return transientRewardsList as Warframe.TransientMission[];
 }
 
-function normalizeSortieRewards(data: Warframe.PageDataPoint[][]) {
+function normalizeSortieRewards(data: Warframe.PageDataPoint[][]): Warframe.Sorties[] {
+	// For whatever reason, the data incoming for this section doesn't have an empty array to denote end of table
+	if (data[data.length - 1].length !== 0) data.push([]);
 
+	const sortieList = [];
+
+	let table: Partial<Warframe.KeyMission> = {
+		dropList: []
+	};
+	let drop: Partial<Warframe.Drop> = {};
+	for (const row of data) {
+		if (row.length === 0) {
+			// Break point for table
+			sortieList.push({ ...table });
+			table = {
+				dropList: []
+			};
+		}
+		for (const cell of row) {
+			if (cell.tagName === 'th' && !('name' in table)) {
+				table.name = cell.value;
+			} else if (cell.tagName === 'th' && row.length === 1) {
+				// Rotation declaration row
+			} else if (cell.tagName === 'td') {
+				// Data row
+				if (!('drop' in drop)) {
+					drop = {
+						drop: cell.value
+					};
+				} else {
+					drop.rarity = cell.value.split(' (')[0] as Warframe.Rarity;
+					drop.chance = Number((Number(cell.value.split('(')[1].split('%)')[0]) / 100).toFixed(4));
+					table.dropList.push(drop as Warframe.Drop);
+					drop = {};
+				}
+			}
+		}
+	}
+
+	return sortieList as Warframe.Sorties[];
 }
 
 function normalizeCetusRewards() {
@@ -238,7 +276,7 @@ export default function (pageData: Warframe.ExtractedData): Warframe.NormalizedD
 		relicRewards: normalizeRelicRewards(pageData.relicRewards),
 		keyRewards: normalizeKeyRewards(pageData.keyRewards),
 		transientRewards: normalizeTransientRewards(pageData.transientRewards),
-		// sortieRewards: normalizeSortieRewards(pageData.sortieRewards),
+		sortieRewards: normalizeSortieRewards(pageData.sortieRewards),
 		// cetusRewards: normalizeCetusRewards(),
 		// solarisRewards: normalizeSolarisRewards(),
 		// deimosRewards: normalizeDeimosRewards(),

@@ -62,6 +62,7 @@ declare namespace Warframe {
 
 	interface TransientMission extends MissionToDropsMap { }
 	interface KeyMission extends MissionToDropsMap { }
+	interface Sorties extends MissionToDropsMap { }
 
 	interface Relic {
 		relic: string;
@@ -74,8 +75,8 @@ declare namespace Warframe {
 		missionRewards: Mission[];
 		relicRewards: Relic[];
 		keyRewards: KeyMission[];
-		transientRewards: Warframe.TransientMission[];
-		// sortieRewards: void; // PageDataPoint[][];
+		transientRewards: TransientMission[];
+		sortieRewards: Sorties[];
 		// cetusRewards: PageDataPoint[][];
 		// solarisRewards: PageDataPoint[][];
 		// deimosRewards: PageDataPoint[][];
