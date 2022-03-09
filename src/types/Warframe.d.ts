@@ -27,18 +27,8 @@ declare namespace Warframe {
 		chance: number;
 		rarity: Rarity;
 		rotation: Rotation | null;
+		stage: string[] | null;
 	}
-
-	// TODO: Evaluate which RotationDrop schema makes most sense
-	// interface RotationDrop {
-	// 	a: Drop[];
-	// 	b: Drop[];
-	// 	c: Drop[];
-	// }
-
-	// interface RotationDrop extends Drop {
-	// 	rotation: Rotation;
-	// }
 
 	type Planet = 'Mercury' | 'Venus' | 'Earth' | 'Lua' | 'Mars' | 'Deimos' | 'Phobos' | 'Ceres' | 'Jupiter' | 'Europa' | 'Saturn' | 'Uranus' | 'Neptune' | 'Pluto' | 'Eris' | 'Kuva Fortress' | 'Void';
 	type MissionType = 'Arena' | 'Assassination' | 'Assault' | 'Capture' | 'Defection' | 'Defense' | 'Disruption' | 'Excavation' | 'Exterminate' | 'Free Roam/Bounty' | 'Hijack' | 'Infested Salvage' | 'Interception' | 'Junction' | 'Mobile Defense' | 'Pursuit' | 'Rescue' | 'Rush' | 'Sabotage' | 'Sanctuary Onslaught' | 'Skirmish' | 'Spy' | 'Survival' | 'Volatile';
@@ -60,6 +50,7 @@ declare namespace Warframe {
 		dropList: Drop[];
 	}
 
+	interface CetusMission extends MissionToDropsMap { }
 	interface TransientMission extends MissionToDropsMap { }
 	interface KeyMission extends MissionToDropsMap { }
 	interface Sorties extends MissionToDropsMap { }
@@ -77,7 +68,7 @@ declare namespace Warframe {
 		keyRewards: KeyMission[];
 		transientRewards: TransientMission[];
 		sortieRewards: Sorties[];
-		// cetusRewards: PageDataPoint[][];
+		cetusRewards: CetusMission[];
 		// solarisRewards: PageDataPoint[][];
 		// deimosRewards: PageDataPoint[][];
 		// modByAvatar: PageDataPoint[][];

@@ -227,8 +227,54 @@ function normalizeSortieRewards(data: Warframe.PageDataPoint[][]): Warframe.Sort
 	return sortieList as Warframe.Sorties[];
 }
 
-function normalizeCetusRewards() {
+function normalizeCetusRewards(data: Warframe.PageDataPoint[][]) {
+	const cetusRewardsList = [];
 
+	let table: Partial<Warframe.KeyMission> = {
+		dropList: []
+	};
+	let stage: string[] = null;
+	let drop: Partial<Warframe.Drop> = {};
+	for (const row of data) {
+		if (row.length === 0) {
+			// Break point for table
+			cetusRewardsList.push({ ...table });
+			table = {
+				dropList: []
+			};
+			stage = null;
+		}
+
+		for (const cell of row) {
+			if (cell.tagName === 'th' && !('name' in table)) {
+				table.name = cell.value;
+			} else if (cell.tagName === 'th' && row.length === 1) {
+				// Rotation declaration row
+				stage = cell.value
+					.split(',')
+					.map((e) =>
+						e
+							.replace(/\bStage \b|\band Stage \b/g, '')
+							.trim()
+					);
+			} else if (cell.tagName === 'td') {
+				// Data row
+				if (!('drop' in drop)) {
+					drop = {
+						stage,
+						drop: cell.value
+					};
+				} else {
+					drop.rarity = cell.value.split(' (')[0] as Warframe.Rarity;
+					drop.chance = Number((Number(cell.value.split('(')[1].split('%)')[0]) / 100).toFixed(4));
+					table.dropList.push(drop as Warframe.Drop);
+					drop = {};
+				}
+			}
+		}
+	}
+
+	return cetusRewardsList as Warframe.CetusMission[];
 }
 
 function normalizeSolarisRewards() {
@@ -277,7 +323,7 @@ export default function (pageData: Warframe.ExtractedData): Warframe.NormalizedD
 		keyRewards: normalizeKeyRewards(pageData.keyRewards),
 		transientRewards: normalizeTransientRewards(pageData.transientRewards),
 		sortieRewards: normalizeSortieRewards(pageData.sortieRewards),
-		// cetusRewards: normalizeCetusRewards(),
+		cetusRewards: normalizeCetusRewards(pageData.cetusRewards),
 		// solarisRewards: normalizeSolarisRewards(),
 		// deimosRewards: normalizeDeimosRewards(),
 		// modByAvatar: normalizeModByAvatar(),
